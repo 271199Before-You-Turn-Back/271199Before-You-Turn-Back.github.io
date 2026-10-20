@@ -41,21 +41,27 @@
 const path=n=>'assets/game/'+String(n).padStart(2,'0')+'.webp';
 const screens=['游戏标题画面','剧情实机 · 场景与对话','剧情实机 · Q版互动','剧情实机 · 角色对话','游戏菜单','制作名单与游戏界面'];
 const media=item=>item.src||path(item.n);
-const artworks=[{n:7,title:'角色立绘与表情 01',category:'character'},{n:8,title:'角色立绘与表情 02',category:'character'},{n:9,title:'角色服装 01',category:'character'},{n:10,title:'角色服装 02',category:'character'},
+const artworks=[
+{n:7,title:'角色立绘与表情 01',category:'character'},
+{n:8,title:'角色立绘与表情 02',category:'character'},
+{n:9,title:'角色服装 01',category:'character'},
+{n:10,title:'角色服装 02',category:'character'},
+{n:11,title:'剧情插画 · 画中相遇',category:'cg',group:'精选片段',en:'STORY MOMENTS'},
+{n:13,title:'剧情插画 · 烟火 01',category:'cg',group:'精选片段',en:'STORY MOMENTS'},
+{n:14,title:'剧情插画 · 烟火 02',category:'cg',group:'精选片段',en:'STORY MOMENTS'},
+{src:'media/snow-visit.webp',title:'剧情插画 · 雪夜来访',category:'cg',group:'精选片段',en:'STORY MOMENTS'},
 {src:'media/morning-1.webp',title:'清晨 · 01',category:'cg',group:'清晨',en:'A QUIET MORNING'},
 {src:'media/morning-2.webp',title:'清晨 · 02',category:'cg',group:'清晨',en:'A QUIET MORNING'},
 {src:'media/christmas-1.webp',title:'圣诞 · 01',category:'cg',group:'圣诞',en:'CHRISTMAS MOMENTS'},
 {src:'media/christmas-2.webp',title:'圣诞 · 02',category:'cg',group:'圣诞',en:'CHRISTMAS MOMENTS'},
-{src:'media/christmas-3.webp',title:'圣诞 · 03',category:'cg',group:'圣诞',en:'CHRISTMAS MOMENTS'},
-{n:11,title:'剧情插画 · 画中相遇',category:'cg',group:'更多片段',en:'MORE MEMORIES'},
-{n:13,title:'剧情插画 · 烟火 01',category:'cg',group:'更多片段',en:'MORE MEMORIES'},
-{n:14,title:'剧情插画 · 烟火 02',category:'cg',group:'更多片段',en:'MORE MEMORIES'}];
+{src:'media/christmas-3.webp',title:'圣诞 · 03',category:'cg',group:'圣诞',en:'CHRISTMAS MOMENTS'}];
+
 let screenIndex=0,modalItems=[],modalIndex=0,lastFocus;
 const thumbs=document.querySelector('#thumbs'),main=document.querySelector('#screen-main'),viewer=document.querySelector('#viewer');
 screens.forEach((title,i)=>{const b=document.createElement('button');b.className='thumb';b.setAttribute('aria-label',title);b.innerHTML='<img src="'+path(i+1)+'" alt="" loading="lazy">';b.onclick=()=>setScreen(i);thumbs.append(b)});
 function setScreen(i){screenIndex=(i+screens.length)%screens.length;main.src=path(screenIndex+1);main.alt=screens[screenIndex];document.querySelector('#screen-label').textContent=String(screenIndex+1).padStart(2,'0')+' / 06 · '+screens[screenIndex];document.querySelector('#screen-open').setAttribute('aria-label','放大'+screens[screenIndex]);[...thumbs.children].forEach((b,j)=>{b.classList.toggle('active',j===screenIndex);b.setAttribute('aria-pressed',String(j===screenIndex))})}
 document.querySelector('#screen-prev').onclick=()=>setScreen(screenIndex-1);document.querySelector('#screen-next').onclick=()=>setScreen(screenIndex+1);document.querySelector('#screen-open').onclick=()=>openModal(screens.map((title,i)=>({n:i+1,title})),screenIndex);
-function showArt(category){const grid=document.querySelector('#art-grid');grid.replaceChildren();grid.classList.toggle('cg-grid',category==='cg');let group='';const items=artworks.filter(a=>a.category===category);grid.setAttribute('aria-labelledby',category==='cg'?'tab-cg':'tab-character');items.forEach((item,i)=>{if(item.group&&group!==item.group){group=item.group;const h=document.createElement('h3');h.className='cg-heading';h.innerHTML=item.group+' <small>'+item.en+'</small>';grid.append(h)}const card=document.createElement('article');card.className='art-card'+(['圣诞','更多片段'].includes(item.group)?' christmas':'');const button=document.createElement('button');button.setAttribute('aria-label','放大查看：'+item.title);button.innerHTML='<img src="'+media(item)+'" alt="'+item.title+'" loading="lazy">';button.onclick=()=>openModal(items,i);const p=document.createElement('p');p.textContent=String(i+1).padStart(2,'0')+' / '+item.title;card.append(button,p);grid.append(card)});document.querySelectorAll('.tab').forEach(b=>{const active=b.dataset.category===category;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1})}
+function showArt(category){const grid=document.querySelector('#art-grid');grid.replaceChildren();grid.classList.toggle('cg-grid',category==='cg');let group='';const items=artworks.filter(a=>a.category===category);grid.setAttribute('aria-labelledby',category==='cg'?'tab-cg':'tab-character');items.forEach((item,i)=>{if(item.group&&group!==item.group){group=item.group;const h=document.createElement('h3');h.className='cg-heading';h.innerHTML=item.group+' <small>'+item.en+'</small>';grid.append(h)}const card=document.createElement('article');card.className='art-card'+(item.group==='圣诞'?' christmas':'');const button=document.createElement('button');button.setAttribute('aria-label','放大查看：'+item.title);button.innerHTML='<img src="'+media(item)+'" alt="'+item.title+'" loading="lazy">';button.onclick=()=>openModal(items,i);const p=document.createElement('p');p.textContent=String(i+1).padStart(2,'0')+' / '+item.title;card.append(button,p);grid.append(card)});document.querySelectorAll('.tab').forEach(b=>{const active=b.dataset.category===category;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1})}
 document.querySelectorAll('.tab').forEach(b=>{b.onclick=()=>showArt(b.dataset.category);b.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const target=e.key==='Home'?document.querySelector('#tab-character'):e.key==='End'?document.querySelector('#tab-cg'):document.querySelector(b.dataset.category==='character'?'#tab-cg':'#tab-character');showArt(target.dataset.category);target.focus()}}});
 function displayModal(){const item=modalItems[modalIndex];document.querySelector('#modal-image').src=media(item);document.querySelector('#modal-image').alt=item.title;document.querySelector('#modal-title').textContent=(modalIndex+1)+' / '+modalItems.length+' · '+item.title}
 function openModal(items,i){lastFocus=document.activeElement;modalItems=items;modalIndex=i;displayModal();viewer.showModal();document.body.style.overflow='hidden'}
